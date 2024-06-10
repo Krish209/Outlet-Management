@@ -1,0 +1,139 @@
+body {
+  font-family: sans-serif;
+  background: -webkit-linear-gradient(to right, #155799, #159957);
+  background: linear-gradient(to right, #155799, #159957);
+  color: whitesmoke;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px;
+  margin-bottom: 10px;
+}
+
+h3 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+form {
+  width: 35rem;
+  margin: auto;
+  color: whitesmoke;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(11, 15, 13, 0.582);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  padding: 10px 25px;
+  margin-top: 10px; 
+}
+
+input[type=text],
+input[type=email],
+input[type=password],
+select {
+  width: 100%;
+  margin: 6px 0;
+  border-radius: 5px;
+  padding: 12px 15px;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #030804;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 16px;
+}
+
+button:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.headingsContainer {
+  text-align: center;
+}
+
+.headingsContainer p {
+  color: gray;
+  margin: 1px;
+  margin-bottom: 15px;
+}
+
+.mainContainer {
+  padding: 14px;
+}
+
+.subcontainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subcontainer a {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.signin {
+  color: white;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.signin a {
+  color: rgb(74, 146, 235);
+}
+
+.signin a:link {
+  text-decoration: none;
+}
+
+.userTypeContainer {
+  display: flex;
+  align-items: center;
+  /* margin-top: 10px; */
+  /* margin-bottom: 1px; */
+}
+
+.userTypeContainer label {
+  margin-right: 10px;
+}
+
+/* Adjust the width of the dropdown menu */
+select {
+  width: 130px;
+}
+
+/* Media queries for the responsiveness of the page */
+@media screen and (max-width: 600px) {
+  form {
+      width: 25rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  form {
+      width: 20rem;
+  }
+}
+
+/* Eye icon for password visibility */
+.eye-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #121617;
+  cursor: pointer;
+}
+
+.eye-icon:hover {
+  color: #2f14dd;
+}
