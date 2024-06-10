@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outlet Management</title>
+    <link rel="stylesheet" type="text/css" href="/static/outlet_management.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <header>
+    <div class="header-left">
+        <span class="menu-icon" onclick="toggleSidebar()">&#9776;</span>
+        <h1 class="title">Outlet Management</h1>
+    </div>
+    
+    <div class="header-right">
+        <a href="/" class="logout-link">
+            <img src="/static/logo.png" alt="Logout" class="logout-icon">
+            <span class="logout-text">Logout</span>
+        </a>
+    </div>
+     
+</header>
+
+    <aside id="sidebar">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('outlet_management') }}">Outlet Management</a></li>
+                <li><a href="{{url_for('stakeholder_details')}}">Stakeholder Details</a></li>
+                {% if user_type == 'stakeholder' %}
+                <li><a href="{{url_for('inventory_details')}}">Inventory Details</a></li>
+                <li><a href="{{url_for('employee_details')}}">Employee Details</a></li>
+                <li><a href="{{url_for('Customer_feedback')}}">Customer feedback</a></li>
+                <li><a href="{{url_for('Rent_details')}}">Rent details</a></li>
+                {% endif %}
+                <li><a href="{{url_for('Survey_details')}}">Survey Details</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="content-container">
+            <div class="search-bar">
+                <form method="POST" action="/outlet_management">
+                    <input type="text" name="searchInput" id="searchInput" placeholder="Search Outlet...">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Outlet Name</th>
+                        <th>Location</th>
+                        <th>Contact</th>
+                        <th>Timing</th>
+                        <th>Rating</th>
+                        {% if user_type=='stakeholder'%}
+                        <th>Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for outlet in outlets %}
+                    <tr>
+                        <!-- <td><input type="checkbox" name="selected[]" value="{{ outlet[0] }}"></td> -->
+                        <td>{{ outlet[1] }}</td>
+                        <td>{{ outlet[2] }}</td>
+                        <td>{{ outlet[3] }}</td>
+                        <td>{{ outlet[4] }}</td>
+                        <td>{{ outlet[5] }}</td>
+                        {% if user_type == 'stakeholder'%}
+                        <td>
+                            <a href="/update/{{outlet[0]}}" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modaledit{{outlet[0]}}">Edit</a>
+                            <a href="/delete/{{outlet[0]}}" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-sm">Delete</a>
+
+                        </td>
+                        {% endif %}
+                    </tr>
+                    
+                    <!--Enter new outlet-->
+                    <div id="myModal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-primary" style="align-content: center;">Please Add New Outlet</h5>    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <form action="/insert_outlet" method="POST" id="addOutletForm">
+                                        <div class="form-group">
+                                            <label>Outlet Name</label>
+                                            <input type="text" name="name" class="form-control" id="outletName" placeholder="Enter Outlet Name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Location</label>
+                                            <input type="text" name="Location" class="form-control" id="location" placeholder="Location" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Contact</label>
+                                            <input name="Contact" type="text" class="form-control" id="contact" placeholder="Contact Details" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Timings</label>
+                                            <input name="Timings" type="text" class="form-control" id="timings" placeholder="Timings" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Rating</label>
+                                            <input name="Rating" type="text" class="form-control" id="rating" min="0" max="5" placeholder="Rating" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-2">Save</button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>    
+
+                    </div>
+
+
+                    <!--Edit outlet-->
+                    <div id="modaledit{{outlet[0]}}" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-primary" style="align-content: center;">Update Outlet Details</h5>    
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <form action="/update_outlet" method="POST" id="updateOutletForm">
+                                    <!-- <form action="/update_outlet" method="POST" id = "addOutletForm">    -->
+                                        <input type='hidden' name='id' value="{{outlet[0]}}">
+                                        <div class="form-group">
+                                            <label>Outlet Name</label>
+                                            <input value="{{outlet[1]}}" type="text" name="name" class="form-control" id="outletName" placeholder="Outlet Name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Location</label>
+                                            <input value="{{outlet[2]}}" type="text" name="Location" class="form-control" id="location" placeholder="Location" required>
+                                        </div>
+                                        <div class="form-group">    
+                                            <label>Contact</label>
+                                            <input value="{{outlet[3]}}" name="Contact" type="text" class="form-control contact-input" id="contact" placeholder="Contact Details" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Timings</label>
+                                            <input value="{{outlet[4]}}" name="Timings" type="text" class="form-control" id="timings" placeholder="Timings" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Rating</label>
+                                            <input value="{{outlet[5]}}" name="Rating" type="text" class="form-control rating-input" min="0" max="5" placeholder="Rating" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success mb-2">Update</button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>    
+
+                    </div>
+
+
+                    <!-- Rename column modal -->
+                    <div id="renameModal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Rename Column</h5>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="newColumnName">Please provide a new name for the outlet:</label>
+                                    <input type="text" id="newColumnName" name="newColumnName" class="form-control" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" onclick="renameColumn()">Rename</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            {% if user_type=='stakeholder'%}
+            <div class="button-container">
+                <button class="btn btn-primary float-right" data-toggle="modal" data-target="#myModal">Add</button>
+                <button class="btn btn-primary btn-sm" onclick="openRenameModal()">Rename</button>
+                <!-- <input id="submit" type="submit" value="Submit"> -->
+            </div>
+            {%endif%}
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2024 IIT Gandhinagar. All rights reserverd.
+    </footer>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Logout confirmation
+        document.querySelector('.logout-link').addEventListener('click', function (event) {
+            const confirmLogout = confirm('Are you sure you want to logout?');
+            if (!confirmLogout) {
+                event.preventDefault();  
+            }
+        });
+
+        // Client-side validation for contact number
+        document.getElementById("contact").addEventListener("input", function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 10); // Remove non-numeric characters and limit to 10 digits
+        });
+
+        // Client-side validation for contact number
+        document.querySelectorAll(".contact-input").forEach(function(input) {
+            input.addEventListener("input", function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 10); // Remove non-numeric characters and limit to 10 digits
+            });
+        });
+
+        // Client-side validation for rating
+        document.getElementById("rating").addEventListener("input", function() {
+           if (parseFloat(this.value) < 0 || parseFloat(this.value) > 5 || isNaN(parseFloat(this.value))) {
+              alert("Please enter a valid rating between 0 and 5.");
+              this.value = ""; // Clear the input field if an invalid value is entered
+           }
+        });
+
+        // Client-side validation for rating
+        document.querySelectorAll("rating-input").forEach(function(input) {
+            input.addEventListener("input", function() {
+                if (parseFloat(this.value) < 0 || parseFloat(this.value) > 5 || isNaN(parseFloat(this.value))) {
+                    alert("Please enter a valid rating between 0 and 5.");
+                    this.value = ""; // Clear the input field if an invalid value is entered
+                }
+            });
+        });
+
+        // Client-side form submission validation
+        document.getElementById("addOutletForm").addEventListener("submit", function(event) {
+           const contact = document.getElementById("contact").value;
+           if (contact.length !== 10 || isNaN(contact)) {
+               alert("Please enter a valid 10-digit contact number.");
+               event.preventDefault();
+           }
+        });
+
+        function openRenameModal() {
+           $('#renameModal').modal('show');
+        }
+
+    function renameColumn() {
+    var newColumnName = $('#newColumnName').val().trim();
+    if (newColumnName !== "") {
+        $.ajax({
+            type: "POST",
+            url: "/rename_column",
+            contentType: "application/json",
+            data: JSON.stringify({newColumnName: newColumnName}),
+            success: function (response) {
+                alert(response);
+                location.reload();
+            },
+            error: function (error) {
+                alert("Error: " + error.responseJSON.message);
+            }
+        });
+    } else {
+        alert("Please enter a valid column name.");
+    }
+    }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+        
+       
+    </script>
+</body>
+</html>

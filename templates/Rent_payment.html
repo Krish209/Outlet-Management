@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Payment</title>
+    <link rel="stylesheet" type="text/css" href="/static/Rent_payment.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <span class="menu-icon" onclick="toggleSidebar()">&#9776;</span>
+            <h1 class="title">Rent Payment</h1>
+        </div>
+
+        <div class="header-right">
+            <a href="/" class="logout-link">
+                <img src="/static/logo.png" alt="Logout" class="logout-icon">
+                <span class="logout-text">Logout</span>
+            </a>
+        </div>
+         
+    </header>
+
+    <aside id="sidebar">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('outlet_management') }}">Outlet Management</a></li>
+                <li><a href="{{url_for('stakeholder_details')}}">Stakeholder Details</a></li>
+                <li><a href="{{url_for('inventory_details')}}">Inventory Details</a></li>
+                <li><a href="{{url_for('employee_details')}}">Employee Details</a></li>
+                <li><a href="{{url_for('Customer_feedback')}}">Customer feedback</a></li>
+                <li><a href="{{url_for('Rent_details')}}">Rent details</a></li>
+                <li><a href="{{url_for('Survey_details')}}">Survey Details</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="content-container">
+            <div class="search-bar">
+                <form method="POST" action="/Rent_details">
+                    <input type="text" name="searchInput" placeholder="Search Outlet...">
+                    <input type="text" name="searchMode" placeholder="Search Mode of Payment..."> <!-- New input field for mode of payment -->
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Outlet Name</th>
+                        <th>Mode of Payment</th>
+                        <th>Paid amount</th>
+                        <th>Rent from date</th>
+                        <th>Rent to date</th>
+                        <th>Due amount</th>
+                        <th>Action</th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rent_payment in rent_payments %}
+                    <tr>
+                        <td>{{ rent_payment[1] }}</td> <!-- Outlet Name -->
+                        <td>{{ rent_payment[2] }}</td> <!-- Mode of Payment -->
+                        <td>{{ rent_payment[3] }}</td> <!-- Paid Amount -->
+                        <td>{{ rent_payment[4] }}</td> <!-- Rent From Date -->
+                        <td>{{ rent_payment[5] }}</td> <!-- Rent To Date -->
+                        <td>{{ rent_payment[6] }}</td> <!-- Due Amount -->
+                        <td>
+                            <a href="" class="btn btn-warning btn-sm" data-toggle="modal" data-target="">Edit</a>
+                            <a href="" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+        </table>
+        <div class="button-container">
+            <button class="btn btn-primary float-right" data-toggle="modal" data-target="#myModal">Add</button>
+            <button class="btn btn-primary btn-sm" onclick="openRenameModal()">Rename</button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    &copy; 2024 IIT Gandhinagar. All rights reserverd.
+</footer>
+
+<script>
+    // Logout confirmation
+    document.querySelector('.logout-link').addEventListener('click', function (event) {
+            const confirmLogout = confirm('Are you sure you want to logout?');
+            if (!confirmLogout) {
+                event.preventDefault();  
+            }
+        });
+        
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+    }
+            function updateButtonStates() {
+                const selectedCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+                const numSelected = selectedCheckboxes.length;
+    
+                document.getElementById('add-button').disabled = numSelected > 0;
+                document.getElementById('edit-button').disabled = numSelected !== 1;
+                document.getElementById('delete-button').disabled = numSelected <= 0;
+            }
+    
+            document.querySelector('tbody').addEventListener('change', updateButtonStates);
+    
+            document.getElementById('add-button').addEventListener('click', function() {
+                addTableRow();
+                updateButtonStates();
+            });
+    
+            document.getElementById('edit-button').addEventListener('click', function() {
+                const selectedRow = document.querySelector('tbody input[type="checkbox"]:checked').parentNode.parentNode;
+                makeRowEditable(selectedRow);
+            });
+    
+            document.getElementById('delete-button').addEventListener('click', function() {
+                const selectedCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+                selectedCheckboxes.forEach(checkbox => {
+                    checkbox.parentNode.parentNode.remove();
+                });
+                updateButtonStates();
+            });
+    
+            document.getElementById('submit').addEventListener('click', function() {
+                submitForm();
+            });
+    
+            function addTableRow() {
+                const tableBody = document.querySelector('tbody');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><input type="checkbox"></td>
+                    <td><input type="text" placeholder="Outlet Name"></td>
+                    <td><input type="text" placeholder="Mode of Payment"></td>
+                    <td><input type="text" placeholder="Paid amount"></td>
+                    <td><input type="text" placeholder="Rent from date"></td>
+                    <td><input type="text" placeholder="Rent to date"></td>
+                    <td><input type="text" placeholder="Due amount"></td>
+                    
+                `;
+                tableBody.appendChild(newRow);
+            }
+    
+            function makeRowEditable(row) {
+                const cells = row.querySelectorAll('td:not(:first-child)');
+                cells.forEach(cell => {
+                    const text = cell.innerText;
+                    cell.innerHTML = `<input type="text" value="${text}">`;
+                });
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                checkbox.checked = false;
+            }
+    
+            function submitForm() {
+                const editedRow = document.querySelector('tbody input[type="text"]');
+                if (editedRow) {
+                // Update existing row
+                const cells = editedRow.parentNode.parentNode.querySelectorAll('td:not(:first-child)');
+                cells.forEach(cell => {
+                    cell.innerHTML = `<td>${cell.querySelector('input').value}</td>`;
+                });
+                } else {
+                // Add new row
+                addTableRow();
+                }
+            }
+    
+            updateButtonStates();
+</script>
+
+ <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>    
+ <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>
